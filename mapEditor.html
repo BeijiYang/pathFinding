@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=800px, initial-scale=1.0">
+  <meta name="viewport" content="width=800, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>map editor</title>
   <style>
@@ -25,6 +25,24 @@
 </body>
 <script>
   const map = Array(10000).fill(0);
+  let drawing = false;
+  let unDrawing = false;
+
+  const toggleDraw = (evt) => {
+    const { button } = evt;
+    if (button === 0) drawing = !drawing;
+    if (button === 2) unDrawing = !unDrawing;
+  }
+
+  const handleDraw = (evt) => {
+    if (!drawing && !unDrawing) return;
+    const { target } = evt;
+    let color;
+    if (drawing) color = '#1976D2';
+    if (unDrawing) color = 'lightgrey';
+
+    target.setAttribute('style', `background-color: ${color}`);
+  }
 
   const createMap = () => {
     const mapContainer = document.getElementById('map');
@@ -35,13 +53,18 @@
       for (let j = 0; j < 100; j++) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
-        const color = map[getIndex(i, j)] ? 'black' : 'lightgrey';
+        const color = map[getIndex(i, j)] ? '#1976D2' : 'lightgrey';
         cell.setAttribute('style', `background-color: ${color}`);
+        cell.addEventListener('mouseover', handleDraw);
         fragemt.appendChild(cell);
       }
     }
     mapContainer.appendChild(fragemt);
   }
+
+  document.addEventListener('mousedown', toggleDraw);
+  document.addEventListener('mouseup', toggleDraw);
+  document.addEventListener('contextmenu', evt => evt.preventDefault());
 
   createMap();
 </script>
