@@ -17,16 +17,34 @@
       float: left;
       margin: 1px 1px 0px 0px;
     }
+
+    button {
+      float: right;
+    }
   </style>
 </head>
 
 <body>
-  <div id="map" />
+  <div class="container">
+    <button onclick="handleClear()">clear</button>
+    <button onclick="handleSave()">save</button>
+    <div id="map"></div>
+  </div>
 </body>
+
 <script>
-  const map = Array(10000).fill(0);
+  let map = JSON.parse(localStorage.getItem('map')) || Array(10000).fill(0);
+
   let drawing = false;
   let unDrawing = false;
+
+  const handleSave = () => localStorage.setItem('map', JSON.stringify(map));
+
+  const handleClear = () => {
+    localStorage.setItem('map', JSON.stringify(Array(10000).fill(0)));
+    map = Array(10000).fill(0);
+    renderMap();
+  }
 
   const toggleDraw = (evt) => {
     const { button } = evt;
@@ -34,18 +52,26 @@
     if (button === 2) unDrawing = !unDrawing;
   }
 
-  const handleDraw = (evt) => {
+  const handleDraw = (idx, evt) => {
     if (!drawing && !unDrawing) return;
     const { target } = evt;
     let color;
-    if (drawing) color = '#1976D2';
-    if (unDrawing) color = 'lightgrey';
+    if (drawing) {
+      map[idx] = 1;
+      color = '#1976D2';
+    }
+    if (unDrawing) {
+      map[idx] = 0;
+      color = 'lightgrey';
+    }
 
     target.setAttribute('style', `background-color: ${color}`);
   }
 
-  const createMap = () => {
+  const renderMap = () => {
     const mapContainer = document.getElementById('map');
+    mapContainer.innerHTML = '';
+
     const fragemt = document.createDocumentFragment();
     const getIndex = (x, y) => 100 * x + y;
 
@@ -55,7 +81,7 @@
         cell.classList.add('cell');
         const color = map[getIndex(i, j)] ? '#1976D2' : 'lightgrey';
         cell.setAttribute('style', `background-color: ${color}`);
-        cell.addEventListener('mouseover', handleDraw);
+        cell.addEventListener('mouseover', evt => handleDraw(getIndex(i, j), evt));
         fragemt.appendChild(cell);
       }
     }
@@ -66,7 +92,7 @@
   document.addEventListener('mouseup', toggleDraw);
   document.addEventListener('contextmenu', evt => evt.preventDefault());
 
-  createMap();
+  renderMap();
 </script>
 
 </html>
