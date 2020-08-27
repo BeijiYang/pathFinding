@@ -71,6 +71,7 @@
   const clidkToDraw = (idx, evt) => {
     const { target, button } = evt;
     if (button === 0) {
+      console.log(idx)
       map[idx] = 1;
       color = '#1976D2';
     }
@@ -81,34 +82,43 @@
     target.setAttribute('style', `background-color: ${color}`);
   }
 
-  const findPath = (map, start, end) => {
+  const sleep = timeout => (new Promise((resolve, reject) => setTimeout(resolve, timeout)));
+
+  const findPath = async (map, start, end) => {
     // 寻路算法，这个集合是关键。广度优先搜索是用队列(push shift)，深度优先搜索是用栈(push pop)。
     // 思路：
     // 集合初始元素是起点本身。之后，把能走到的点都放进来。
     // 放进来的点，也成为新的起点，所以再取出计算能走到的点，并放进来。
     // 直到找到终点，或集合为空。
     const queue = [start];
+    const mapContainer = document.getElementById('map');
 
-    const insert = (x, y) => {
+    const insert = async (x, y) => {
       // 超出边界
       if (x < 0 || x > 99 || y < 0 || y > 99) return;
       // 不能走 或 走过了
       if (map[100 * x + y]) return;
       // 标记走过了
       map[100 * x + y] = 2;
+      await sleep(5);
+      mapContainer.children[100 * x + y].setAttribute('style', `background-color: #4CAF50`);
       queue.push([x, y]);
     }
 
     while (queue.length) {
-      const [x, y] = queue.shift();
-      console.log(x, y);
-      if (x === end[0] && y === end[1]) return true;
+      const [x, y] = queue.shift(); // BFS
+      // const [x, y] = queue.pop(); // DFS
+      // console.log(x, y);
+      if (x === end[0] && y === end[1]) {
+        mapContainer.children[100 * x + y].setAttribute('style', `background-color: #FF5722`);
+        return true;
+      }
 
       // 先找上右下左四个方向
-      insert(x - 1, y);
-      insert(x, y + 1);
-      insert(x + 1, y);
-      insert(x, y - 1);
+      await insert(x - 1, y);
+      await insert(x, y + 1);
+      await insert(x + 1, y);
+      await insert(x, y - 1);
     }
     return false;
   }
