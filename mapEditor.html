@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=800px, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>map editor</title>
+  <style>
+    #map {
+      width: 700px;
+    }
+
+    .cell {
+      width: 6px;
+      height: 6px;
+      float: left;
+      margin: 1px 1px 0px 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map" />
+</body>
+<script>
+  const map = Array(10000).fill(0);
+
+  const createMap = () => {
+    const mapContainer = document.getElementById('map');
+    const fragemt = document.createDocumentFragment();
+    const getIndex = (x, y) => 100 * x + y;
+
+    for (let i = 0; i < 100; i++) {
+      for (let j = 0; j < 100; j++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        const color = map[getIndex(i, j)] ? 'black' : 'lightgrey';
+        cell.setAttribute('style', `background-color: ${color}`);
+        fragemt.appendChild(cell);
+      }
+    }
+    mapContainer.appendChild(fragemt);
+  }
+
+  createMap();
+</script>
+
+</html>
